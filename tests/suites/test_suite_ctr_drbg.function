@@ -77,6 +77,7 @@ void ctr_drbg_validate( int reseed_mode, char *nonce_string,
     mbedtls_ctr_drbg_context ctx;
     unsigned char buf[64];
     unsigned char result[64];
+
     size_t entropy_chunk_len = (size_t) entropy_len_arg;
     size_t nonce_len, reseed_len, add1_len, add2_len, result_len;
 
@@ -146,9 +147,12 @@ void ctr_drbg_validate_no_reseed( char *add_init_string, char *entropy_string,
                                   char *add1_string, char *add2_string,
                                   char *result_string )
 {
+
+    char empty_str[1];
+    empty_str[0] = 0;
     test_suite_ctr_drbg_validate( RESEED_NEVER, add_init_string,
                                   strlen( entropy_string ) / 2, entropy_string,
-                                  "", add1_string, add2_string,
+                                  empty_str, add1_string, add2_string,
                                   result_string );
     goto exit;
 }
@@ -159,9 +163,11 @@ void ctr_drbg_validate_pr( char *add_init_string, char *entropy_string,
                            char *add1_string, char *add2_string,
                            char *result_string )
 {
+    char empty_str[1];
+    empty_str[0] = 0;
     test_suite_ctr_drbg_validate( RESEED_ALWAYS, add_init_string,
                                   strlen( entropy_string ) / 6, entropy_string,
-                                  "", add1_string, add2_string,
+                                  empty_str, add1_string, add2_string,
                                   result_string );
     goto exit;
 }
