@@ -2030,16 +2030,6 @@
 #define MBEDTLS_CTR_DRBG_C
 
 /**
- * configure key size for ctr DRBG , either
- * MBEDTLS_CTR_DRBG_KEYSIZE_256 (default)
- * or
- * MBEDTLS_CTR_DRBG_KEYSIZE_128
- * must be set.
- */
-#if !defined(MBEDTLS_CTR_DRBG_KEY_SIZE_128)
-#define MBEDTLS_CTR_DRBG_KEY_SIZE_256 1
-#endif
-/**
  * \def MBEDTLS_DEBUG_C
  *
  * Enable the debug functions.
@@ -2920,6 +2910,7 @@
 //#define MBEDTLS_CTR_DRBG_MAX_INPUT                256 /**< Maximum number of additional input bytes */
 //#define MBEDTLS_CTR_DRBG_MAX_REQUEST             1024 /**< Maximum number of requested bytes per call */
 //#define MBEDTLS_CTR_DRBG_MAX_SEED_INPUT           384 /**< Maximum size of (re)seed buffer */
+//#define MBEDTLS_CTR_DRBG_USE_128_BIT_KEY              /** use 128 bit key for CTR-DRBG - redcuces security */
 
 /* HMAC_DRBG options */
 //#define MBEDTLS_HMAC_DRBG_RESEED_INTERVAL   10000 /**< Interval before reseed is performed by default */
