@@ -2018,7 +2018,9 @@
 /**
  * \def MBEDTLS_CTR_DRBG_C
  *
- * Enable the CTR_DRBG AES-256-based(default) or AES-128-based random generator.
+ * Enable the CTR_DRBG AES-based random generator.
+ * The CTR_DRBG generator uses AES-256 by default.
+ * To use AES-128 instead, enable MBEDTLS_CTR_DRBG_USE_128_BIT_KEY below.
  *
  * Module:  library/ctr_drbg.c
  * Caller:
