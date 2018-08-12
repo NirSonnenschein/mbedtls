@@ -22,48 +22,8 @@ static int mbedtls_test_entropy_func( void *data, unsigned char *buf, size_t len
     test_offset_idx += len;
     return( 0 );
 }
-/* END_HEADER */
 
-/* BEGIN_DEPENDENCIES
- * depends_on:MBEDTLS_CTR_DRBG_C
- * END_DEPENDENCIES
- */
-
-/* BEGIN_CASE */
-void ctr_drbg_special_behaviours( )
-{
-    mbedtls_ctr_drbg_context ctx;
-    unsigned char output[512];
-    unsigned char additional[512];
-
-    mbedtls_ctr_drbg_init( &ctx );
-    memset( output, 0, sizeof( output ) );
-    memset( additional, 0, sizeof( additional ) );
-
-    TEST_ASSERT( mbedtls_ctr_drbg_random_with_add( &ctx,
-                        output, MBEDTLS_CTR_DRBG_MAX_REQUEST + 1,
-                        additional, 16 ) ==
-                        MBEDTLS_ERR_CTR_DRBG_REQUEST_TOO_BIG );
-    TEST_ASSERT( mbedtls_ctr_drbg_random_with_add( &ctx,
-                        output, 16,
-                        additional, MBEDTLS_CTR_DRBG_MAX_INPUT + 1 ) ==
-                        MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG );
-
-    TEST_ASSERT( mbedtls_ctr_drbg_reseed( &ctx, additional,
-                        MBEDTLS_CTR_DRBG_MAX_SEED_INPUT + 1 ) ==
-                        MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG );
-
-    mbedtls_ctr_drbg_set_entropy_len( &ctx, ~0 );
-    TEST_ASSERT( mbedtls_ctr_drbg_reseed( &ctx, additional,
-                        MBEDTLS_CTR_DRBG_MAX_SEED_INPUT ) ==
-                        MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG );
-exit:
-    mbedtls_ctr_drbg_free( &ctx );
-}
-/* END_CASE */
-
-/* BEGIN_CASE */
-void ctr_drbg_validate( int reseed_mode, char *nonce_string,
+static int ctr_drbg_validate_internal( int reseed_mode, char *nonce_string,
                         int entropy_len_arg, char *entropy_string,
                         char *reseed_string,
                         char *add1_string, char *add2_string,
@@ -139,6 +99,60 @@ void ctr_drbg_validate( int reseed_mode, char *nonce_string,
 
 exit:
     mbedtls_ctr_drbg_free( &ctx );
+    return 0;
+}
+
+/* END_HEADER */
+
+/* BEGIN_DEPENDENCIES
+ * depends_on:MBEDTLS_CTR_DRBG_C
+ * END_DEPENDENCIES
+ */
+
+/* BEGIN_CASE */
+void ctr_drbg_special_behaviours( )
+{
+    mbedtls_ctr_drbg_context ctx;
+    unsigned char output[512];
+    unsigned char additional[512];
+
+    mbedtls_ctr_drbg_init( &ctx );
+    memset( output, 0, sizeof( output ) );
+    memset( additional, 0, sizeof( additional ) );
+
+    TEST_ASSERT( mbedtls_ctr_drbg_random_with_add( &ctx,
+                        output, MBEDTLS_CTR_DRBG_MAX_REQUEST + 1,
+                        additional, 16 ) ==
+                        MBEDTLS_ERR_CTR_DRBG_REQUEST_TOO_BIG );
+    TEST_ASSERT( mbedtls_ctr_drbg_random_with_add( &ctx,
+                        output, 16,
+                        additional, MBEDTLS_CTR_DRBG_MAX_INPUT + 1 ) ==
+                        MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG );
+
+    TEST_ASSERT( mbedtls_ctr_drbg_reseed( &ctx, additional,
+                        MBEDTLS_CTR_DRBG_MAX_SEED_INPUT + 1 ) ==
+                        MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG );
+
+    mbedtls_ctr_drbg_set_entropy_len( &ctx, ~0 );
+    TEST_ASSERT( mbedtls_ctr_drbg_reseed( &ctx, additional,
+                        MBEDTLS_CTR_DRBG_MAX_SEED_INPUT ) ==
+                        MBEDTLS_ERR_CTR_DRBG_INPUT_TOO_BIG );
+exit:
+    mbedtls_ctr_drbg_free( &ctx );
+}
+/* END_CASE */
+
+/* BEGIN_CASE */
+void ctr_drbg_validate( int reseed_mode, char *nonce_string,
+                        int entropy_len_arg, char *entropy_string,
+                        char *reseed_string,
+                        char *add1_string, char *add2_string,
+                        char *result_string )
+{
+    TEST_ASSERT( ctr_drbg_validate_internal( reseed_mode, nonce_string,
+                                             entropy_len_arg, entropy_string,
+                                             reseed_string, add1_string,
+                                             add2_string, result_string) == 0 );
 }
 /* END_CASE */
 
@@ -150,11 +164,10 @@ void ctr_drbg_validate_no_reseed( char *add_init_string, char *entropy_string,
 
     char empty_str[1];
     empty_str[0] = 0;
-    test_suite_ctr_drbg_validate( RESEED_NEVER, add_init_string,
+    TEST_ASSERT( ctr_drbg_validate_internal( RESEED_NEVER, add_init_string,
                                   strlen( entropy_string ) / 2, entropy_string,
                                   empty_str, add1_string, add2_string,
-                                  result_string );
-    goto exit;
+                                  result_string ) == 0);
 }
 /* END_CASE */
 
@@ -165,11 +178,10 @@ void ctr_drbg_validate_pr( char *add_init_string, char *entropy_string,
 {
     char empty_str[1];
     empty_str[0] = 0;
-    test_suite_ctr_drbg_validate( RESEED_ALWAYS, add_init_string,
+    TEST_ASSERT( ctr_drbg_validate_internal( RESEED_ALWAYS, add_init_string,
                                   strlen( entropy_string ) / 6, entropy_string,
                                   empty_str, add1_string, add2_string,
-                                  result_string );
-    goto exit;
+                                  result_string ) == 0);
 }
 /* END_CASE */
 
@@ -178,11 +190,10 @@ void ctr_drbg_validate_nopr( char *add_init_string, char *entropy_string,
                              char *add1_string, char *add_reseed_string,
                              char *add2_string, char *result_string )
 {
-    test_suite_ctr_drbg_validate( RESEED_SECOND, add_init_string,
+    TEST_ASSERT( ctr_drbg_validate_internal( RESEED_SECOND, add_init_string,
                                   strlen( entropy_string ) / 4, entropy_string,
                                   add_reseed_string, add1_string, add2_string,
-                                  result_string );
-    goto exit;
+                                  result_string ) == 0);
 }
 /* END_CASE */
 
