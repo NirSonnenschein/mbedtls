@@ -53,7 +53,6 @@
 #if !defined(MBEDTLS_CTR_DRBG_USE_128_BIT_KEY) /* Use default 256-bit key for CTR_DRBG. */
 #define MBEDTLS_CTR_DRBG_KEYSIZE            32 /**< The key size used by the cipher. */
 #else
-#pragma message("Warning: using smaller (128-bit) key size for CTR DRBG may reduce the security of some operations.")
 #define MBEDTLS_CTR_DRBG_KEYSIZE            16 /**< The key size used by the cipher. */
 #endif
 #define MBEDTLS_CTR_DRBG_KEYBITS            ( MBEDTLS_CTR_DRBG_KEYSIZE * 8 ) /**< The key size for the DRBG operation, in bits. */
