@@ -64,7 +64,7 @@ NULL_ENTROPY_WARNING=\n$(WARNING_BORDER)$(NULL_ENTROPY_WARN_L1)$(NULL_ENTROPY_WA
 WARNING_BORDER_LONG      =****************************************************************************\n
 CTR_DRBG_128_BIT_KEY_WARN_L1=****  WARNING!  MBEDTLS_CTR_DRBG_USE_128_BIT_KEY defined!               ****\n
 CTR_DRBG_128_BIT_KEY_WARN_L2=****  Using 128-bit keys for CTR_DRBG limits the security of generated  ****\n
-CTR_DRBG_128_BIT_KEY_WARN_L3=****  keysand operations that use random values to 128-bit security     ****\n
+CTR_DRBG_128_BIT_KEY_WARN_L3=****  keys and operations that use generated values to 128-bit security    ****\n
 
 CTR_DRBG_128_BIT_KEY_WARNING=\n$(WARNING_BORDER_LONG)$(CTR_DRBG_128_BIT_KEY_WARN_L1)$(CTR_DRBG_128_BIT_KEY_WARN_L2)$(CTR_DRBG_128_BIT_KEY_WARN_L3)$(WARNING_BORDER_LONG)
 
@@ -72,7 +72,7 @@ CTR_DRBG_128_BIT_KEY_WARNING=\n$(WARNING_BORDER_LONG)$(CTR_DRBG_128_BIT_KEY_WARN
 post_build:
 ifndef WINDOWS
 
-	# If 128-bit keys are configured for CTR DRBG, display an appropriate warning
+	# If 128-bit keys are configured for CTR_DRBG, display an appropriate warning
 	-scripts/config.pl get MBEDTLS_CTR_DRBG_USE_128_BIT_KEY && ([ $$? -eq 0 ]) && \
 	    echo '$(CTR_DRBG_128_BIT_KEY_WARNING)'
 
