@@ -11,9 +11,8 @@
  * The Mbed TLS implementation of CTR_DRBG uses AES-256 (default) or AES-128
  * as the underlying block cipher.
  *
- *  \warning Using AES-128 for the random number generator limits the security
- *  of all generated keys and all operations that use random values
- *  to 128-bit security.
+ *  \warning Using 128-bit keys for CTR_DRBG limits the security of generated
+ *  keys and operations that use random values generated to 128-bit security.
  */
 /*
  *  Copyright (C) 2006-2018, Arm Limited (or its affiliates), All Rights Reserved
