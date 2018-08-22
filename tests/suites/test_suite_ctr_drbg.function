@@ -187,8 +187,8 @@ void ctr_drbg_validate_pr( char *add_init_string, char *entropy_string,
 /* END_CASE */
 
 /* BEGIN_CASE */
-void ctr_drbg_validate_nopr( data_t * add_init, data_t * entropy,
-                             data_t * add1, data_t * add_reseed,
+void ctr_drbg_validate_nopr( char * add_init_string, char * entropy_string,
+                             char * add1_string, char * add_reseed_string,
                              char *add2_string, char *result_string )
 {
     TEST_ASSERT( ctr_drbg_validate_internal( RESEED_SECOND, add_init_string,
