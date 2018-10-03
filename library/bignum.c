@@ -2211,7 +2211,8 @@ int mbedtls_mpi_gen_prime( mbedtls_mpi *X, size_t nbits, int flags,
     size_t k, n;
     mbedtls_mpi_uint r;
     mbedtls_mpi Y;
-    unsigned int rng_validity_counter = 0;
+    unsigned int rng_validity_counter_fips = 0;
+    unsigned int rng_validity_counter_rng_size = 0;
 
     if( nbits < 3 || nbits > MBEDTLS_MPI_MAX_BITS )
         return( MBEDTLS_ERR_MPI_BAD_INPUT_DATA );
@@ -2225,7 +2226,28 @@ int mbedtls_mpi_gen_prime( mbedtls_mpi *X, size_t nbits, int flags,
         MBEDTLS_MPI_CHK( mbedtls_mpi_fill_random( X, n * ciL, f_rng, p_rng ) );
 
         /* make sure generated number is at least (nbits-1)+0.5 bits (FIPS 186-4 §B.3.3 steps 4.4, 5.5) */
-        if( X->p[n-1] < CEIL_MAXUINT_DIV_SQRT2 ) continue;
+        if( X->p[n-1] < CEIL_MAXUINT_DIV_SQRT2 )
+        {
+            /* If the RNG is faulty, the continue below can lead to an infinite loop.
+               To prevent this, we return an error after this test fails too many times.
+               This test will fail if X/2^(nbits-1) < sqrt(2).
+               If the RNG is operating correctly, this has the probability of 71% 
+               and failing it 30 times in a row has the probability 0.00003%.
+            */
+            if( ( flags & MBEDTLS_MPI_GEN_PRIME_CHECK_RNG ) ==
+                MBEDTLS_MPI_GEN_PRIME_CHECK_RNG )
+            {
+                rng_validity_counter_rng_size++;
+                 mbedtls_printf( "counter at %d,", rng_validity_counter_rng_size );
+
+                if ( rng_validity_counter_rng_size > 200 )
+                {
+                    ret = MBEDTLS_ERR_MPI_RNG_POSSIBLY_FAULTY;
+                    goto cleanup;
+                }
+            }
+            continue;
+        } 
 
         k = n * biL;
         if( k > nbits ) MBEDTLS_MPI_CHK( mbedtls_mpi_shift_r( X, k - nbits ) );
@@ -2288,8 +2310,8 @@ int mbedtls_mpi_gen_prime( mbedtls_mpi *X, size_t nbits, int flags,
         if( ( flags & MBEDTLS_MPI_GEN_PRIME_CHECK_RNG ) ==
             MBEDTLS_MPI_GEN_PRIME_CHECK_RNG )
         {
-            rng_validity_counter++;
-            if ( rng_validity_counter > 5 * nbits )
+            rng_validity_counter_fips++;
+            if ( rng_validity_counter_fips > 5 * nbits )
             {
                 ret = MBEDTLS_ERR_MPI_RNG_POSSIBLY_FAULTY;
                 goto cleanup;

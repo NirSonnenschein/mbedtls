@@ -748,9 +748,13 @@ Test good rng check #1
 depends_on:MBEDTLS_GENPRIME
 mbedtls_mpi_rng_check_test:
 
-Test bad rng check #1
+Test bad rng check #1 (non primes)
 depends_on:MBEDTLS_GENPRIME
 mbedtls_mpi_bad_rng_check_test:"F55102B67930FBE8858DF6C0642D77D419A7B7968E622CC7500F3E3F2C5168368C50E00831873187"
+
+Test bad rng check #2 (too small)
+depends_on:MBEDTLS_GENPRIME
+mbedtls_mpi_bad_rng_check_test:"55555555555555555555555555555555"
 
 MPI Selftest
 depends_on:MBEDTLS_SELF_TEST
